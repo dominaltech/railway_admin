@@ -1,1 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailBook Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --primary: #003366;
+            --secondary: #0055aa;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --border: #dee2e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            border-color: var(--primary);
+            background: var(--light);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .panel {
+            display: none;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .panel h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .data-table tr:hover {
+            background: var(--light);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary);
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚂 RailBook Admin Panel</h1>
+        <p>Manage sections, departments, posts, and PDFs</p>
+    </div>
+
+    <div class="container">
+        <div id="alertContainer"></div>
+
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <h3>Total Sections</h3>
+                <div class="number" id="statSections">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Departments</h3>
+                <div class="number" id="statDepartments">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Posts</h3>
+                <div class="number" id="statPosts">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total PDFs</h3>
+                <div class="number" id="statPdfs">-</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('sections')">Sections</button>
+            <button class="tab" onclick="switchTab('departments')">Departments</button>
+            <button class="tab" onclick="switchTab('posts')">Posts</button>
+            <button class="tab" onclick="switchTab('pdfs')">PDFs</button>
+        </div>
+
+        <!-- Sections Panel -->
+        <div id="sections-panel" class="panel active">
+            <h2>Manage Sections</h2>
+            <button class="btn btn-success" onclick="openAddModal('section')">+ Add New Section</button>
+            <div id="sections-table"></div>
+        </div>
+
+        <!-- Departments Panel -->
+        <div id="departments-panel" class="panel">
+            <h2>Manage Departments</h2>
+            <button class="btn btn-success" onclick="openAddModal('department')">+ Add New Department</button>
+            <div id="departments-table"></div>
+        </div>
+
+        <!-- Posts Panel -->
+        <div id="posts-panel" class="panel">
+            <h2>Manage Posts</h2>
+            <button class="btn btn-success" onclick="openAddModal('post')">+ Add New Post</button>
+            <div id="posts-table"></div>
+        </div>
+
+        <!-- PDFs Panel -->
+        <div id="pdfs-panel" class="panel">
+            <h2>Manage PDFs</h2>
+            <button class="btn btn-success" onclick="openAddModal('pdf')">+ Add New PDF</button>
+            <div id="pdfs-table"></div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Item</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <div id="formFields"></div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://qkqnynqkhyzcdudoyfel.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrcW55bnFraHl6Y2R1ZG95ZmVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NzczNDgsImV4cCI6MjA4NDU1MzM0OH0.e2IeGp-T8bdfMS2UNKWdbpllXSK1qIwyozh0ZGCdSD0';
+
+        let currentTab = 'sections';
+        let currentEditId = null;
+        let currentEditType = null;
+
+        // API Functions
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+            const headers = {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation',
+                ...options.headers
+            };
+
+            const response = await fetch(url, { ...options, headers });
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.statusText}`);
+            }
+            return response.json();
+        }
+
+        async function fetchData(table, params = '') {
+            return apiRequest(`${table}?${params}`);
+        }
+
+        async function insertData(table, data) {
+            return apiRequest(table, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+        }
+
+        async function updateData(table, id, data) {
+            return apiRequest(`${table}?id=eq.${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data)
+            });
+        }
+
+        async function deleteData(table, id) {
+            return apiRequest(`${table}?id=eq.${id}`, {
+                method: 'DELETE'
+            });
+        }
+
+        // UI Functions
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update panels
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${tab}-panel`).classList.add('active');
+
+            // Load data
+            loadTabData(tab);
+        }
+
+        async function loadTabData(tab) {
+            const container = document.getElementById(`${tab}-table`);
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
+
+            try {
+                let data;
+                let columns;
+
+                switch(tab) {
+                    case 'sections':
+                        data = await fetchData('sections', 'order=display_order.asc');
+                        columns = ['simple_id', 'name', 'description', 'display_order'];
+                        break;
+                    case 'departments':
+                        data = await fetchData('departments', 'select=*,sections(name)&order=display_order.asc');
+                        columns = ['simple_id', 'name', 'sections.name', 'description', 'display_order'];
+                        break;
+                    case 'posts':
+                        data = await fetchData('posts', 'select=*,departments(name)&order=display_order.asc');
+                        columns = ['simple_id', 'name', 'departments.name', 'description', 'display_order'];
+                        break;
+                    case 'pdfs':
+                        data = await fetchData('pdfs', 'select=*,posts(name)&order=year.desc');
+                        columns = ['simple_id', 'title', 'posts.name', 'year', 'file_size'];
+                        break;
+                }
+
+                renderTable(data, columns, tab, container);
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-error">Error loading data: ${error.message}</div>`;
+            }
+        }
+
+        function renderTable(data, columns, type, container) {
+            if (data.length === 0) {
+                container.innerHTML = '<p>No data found. Add your first item!</p>';
+                return;
+            }
+
+            let html = '<table class="data-table"><thead><tr>';
+
+            // Headers
+            columns.forEach(col => {
+                html += `<th>${col.replace('_', ' ').toUpperCase()}</th>`;
+            });
+            html += '<th>ACTIONS</th></tr></thead><tbody>';
+
+            // Rows
+            data.forEach(item => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let value = item[col];
+                    if (col.includes('.')) {
+                        const parts = col.split('.');
+                        value = item[parts[0]]?.[parts[1]] || '-';
+                    }
+                    html += `<td>${value || '-'}</td>`;
+                });
+                html += `<td class="actions">
+                    <button class="btn btn-warning btn-sm" onclick='editItem("${type}", ${JSON.stringify(item)})'>Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteItem('${type}', '${item.id}')">Delete</button>
+                </td></tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function openAddModal(type) {
+            currentEditType = type;
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = `Add New ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            generateForm(type, null);
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function editItem(type, item) {
+            currentEditType = type;
+            currentEditId = item.id;
+            document.getElementById('modalTitle').textContent = `Edit ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            generateForm(type, item);
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        async function generateForm(type, data) {
+            const container = document.getElementById('formFields');
+            let html = '';
+
+            switch(type) {
+                case 'section':
+                    html = `
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" name="name" value="${data?.name || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description">${data?.description || ''}</textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Display Order</label>
+                                <input type="number" name="display_order" value="${data?.display_order || 1}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Icon Name</label>
+                                <select name="icon_name">
+                                    <option value="briefcase" ${data?.icon_name === 'briefcase' ? 'selected' : ''}>Briefcase</option>
+                                    <option value="users" ${data?.icon_name === 'users' ? 'selected' : ''}>Users</option>
+                                    <option value="train" ${data?.icon_name === 'train' ? 'selected' : ''}>Train</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'department':
+                    const sections = await fetchData('sections', 'order=display_order.asc');
+                    html = `
+                        <div class="form-group">
+                            <label>Section *</label>
+                            <select name="section_id" required>
+                                ${sections.map(s => `<option value="${s.id}" ${data?.section_id === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" name="name" value="${data?.name || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description">${data?.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Display Order</label>
+                            <input type="number" name="display_order" value="${data?.display_order || 1}" required>
+                        </div>
+                    `;
+                    break;
+
+                case 'post':
+                    const departments = await fetchData('departments', 'select=*,sections(name)&order=display_order.asc');
+                    html = `
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <select name="department_id" required>
+                                ${departments.map(d => `<option value="${d.id}" ${data?.department_id === d.id ? 'selected' : ''}>${d.name} (${d.sections.name})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" name="name" value="${data?.name || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description">${data?.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Display Order</label>
+                            <input type="number" name="display_order" value="${data?.display_order || 1}" required>
+                        </div>
+                    `;
+                    break;
+
+                case 'pdf':
+                    const posts = await fetchData('posts', 'select=*,departments(name,sections(name))&order=display_order.asc');
+                    html = `
+                        <div class="form-group">
+                            <label>Post *</label>
+                            <select name="post_id" required>
+                                ${posts.map(p => `<option value="${p.id}" ${data?.post_id === p.id ? 'selected' : ''}>${p.name} (${p.departments.name})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="title" value="${data?.title || ''}" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Year *</label>
+                                <input type="number" name="year" value="${data?.year || new Date().getFullYear()}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>File Size</label>
+                                <input type="text" name="file_size" value="${data?.file_size || ''}" placeholder="e.g., 2.5 MB">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Google Drive Link *</label>
+                            <input type="url" name="drive_link" value="${data?.drive_link || ''}" required placeholder="https://drive.google.com/file/d/...">
+                        </div>
+                    `;
+                    break;
+            }
+
+            container.innerHTML = html;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const table = currentEditType === 'section' ? 'sections' :
+                             currentEditType === 'department' ? 'departments' :
+                             currentEditType === 'post' ? 'posts' : 'pdfs';
+
+                if (currentEditId) {
+                    await updateData(table, currentEditId, data);
+                    showAlert(`${currentEditType} updated successfully!`);
+                } else {
+                    await insertData(table, data);
+                    showAlert(`${currentEditType} added successfully!`);
+                }
+
+                closeModal();
+                loadTabData(currentTab);
+                loadStats();
+            } catch (error) {
+                showAlert(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteItem(type, id) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+
+            try {
+                const table = type === 'section' ? 'sections' :
+                             type === 'department' ? 'departments' :
+                             type === 'post' ? 'posts' : 'pdfs';
+
+                await deleteData(table, id);
+                showAlert(`${type} deleted successfully!`);
+                loadTabData(currentTab);
+                loadStats();
+            } catch (error) {
+                showAlert(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        async function loadStats() {
+            try {
+                const sections = await fetchData('sections');
+                const departments = await fetchData('departments');
+                const posts = await fetchData('posts');
+                const pdfs = await fetchData('pdfs');
+
+                document.getElementById('statSections').textContent = sections.length;
+                document.getElementById('statDepartments').textContent = departments.length;
+                document.getElementById('statPosts').textContent = posts.length;
+                document.getElementById('statPdfs').textContent = pdfs.length;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('editForm').addEventListener('submit', handleFormSubmit);
+
+        // Initial Load
+        loadTabData('sections');
+        loadStats();
+    </script>
+</body>
+</html>
