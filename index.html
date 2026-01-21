@@ -12,330 +12,468 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="RailBook Admin">
     <link rel="apple-touch-icon" href="logo.png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        :root {
-            --primary: #003366;
-            --secondary: #0055aa;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --white: #ffffff;
-            --border: #dee2e6;
-        }
+:root {
+    --primary: #003366;
+    --secondary: #0055aa;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --white: #ffffff;
+    --border: #dee2e6;
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-        }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background-color: var(--light);
+    color: var(--dark);
+}
 
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--white);
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+.header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--white);
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
+.header h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
 
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
+.header p {
+    opacity: 0.9;
+    font-size: 14px;
+}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    overflow-x: hidden;
+}
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
 
-        .tab {
-            padding: 12px 24px;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+.tab {
+    padding: 12px 24px;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
 
-        .tab:hover {
-            border-color: var(--primary);
-            background: var(--light);
-        }
+.tab:hover {
+    border-color: var(--primary);
+    background: var(--light);
+}
 
-        .tab.active {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--primary);
-        }
+.tab.active {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
 
-        .panel {
-            display: none;
-            background: var(--white);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+/* General panel styles for all panels (sections, departments, posts, pdfs) */
+.panel {
+    display: none;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 100%;
+    overflow-x: auto;
+    max-width: 100%;
+}
 
-        .panel.active {
-            display: block;
-        }
+.panel.active {
+    display: block;
+}
 
-        .panel h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
+.panel h2 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 22px;
+}
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+/* Specific panel fixes for mobile */
+#departments-panel,
+#posts-panel,
+#pdfs-panel,
+#sections-panel {
+    width: 100%;
+    margin: 0;
+    padding: 30px;
+    box-sizing: border-box;
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
+.form-group {
+    margin-bottom: 20px;
+}
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark);
+}
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
 
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
 
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
 
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
 
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
 
-        .btn-primary:hover {
-            background: var(--secondary);
-        }
+.btn-primary {
+    background: var(--primary);
+    color: var(--white);
+}
 
-        .btn-success {
-            background: var(--success);
-            color: var(--white);
-        }
+.btn-primary:hover {
+    background: var(--secondary);
+}
 
-        .btn-danger {
-            background: var(--danger);
-            color: var(--white);
-        }
+.btn-success {
+    background: var(--success);
+    color: var(--white);
+}
 
-        .btn-warning {
-            background: var(--warning);
-            color: var(--dark);
-        }
+.btn-danger {
+    background: var(--danger);
+    color: var(--white);
+}
 
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
+.btn-warning {
+    background: var(--warning);
+    color: var(--dark);
+}
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
 
-        .data-table th,
-        .data-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    min-width: 600px; /* Prevent table from shrinking too much */
+}
 
-        .data-table th {
-            background: var(--light);
-            font-weight: 600;
-            color: var(--primary);
-        }
+.data-table th,
+.data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
 
-        .data-table tr:hover {
-            background: var(--light);
-        }
+.data-table th {
+    background: var(--light);
+    font-weight: 600;
+    color: var(--primary);
+}
 
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
+.data-table tr:hover {
+    background: var(--light);
+}
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--primary);
-        }
+.actions {
+    display: flex;
+    gap: 8px;
+}
 
-        .spinner {
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--primary);
+}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+.spinner {
+    border: 4px solid var(--border);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
 
-        .alert {
-            padding: 15px 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+.alert {
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
 
-        .stat-card {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
 
-        .stat-card h3 {
-            font-size: 14px;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
+.stat-card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-        .stat-card .number {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary);
-        }
+.stat-card h3 {
+    font-size: 14px;
+    color: var(--dark);
+    margin-bottom: 8px;
+}
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
+.stat-card .number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+}
 
-        .modal.active {
-            display: flex;
-        }
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
 
-        .modal-content {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+.modal.active {
+    display: flex;
+}
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+.modal-content {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--dark);
-        }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--dark);
+}
 
-            .tabs {
-                overflow-x: auto;
-            }
+@media (max-width: 768px) {
+    .header,
+    .container {
+        padding: 15px;
+    }
 
-            .data-table {
-                font-size: 12px;
-            }
-        }
-    </style>
+    .panel {
+        padding: 15px;
+        margin: 0 -15px; /* Negative margin to fill container width */
+        border-radius: 0;
+        box-shadow: none;
+        width: calc(100% + 30px); /* Compensate for container padding */
+    }
+
+    #departments-panel,
+    #posts-panel,
+    #pdfs-panel,
+    #sections-panel {
+        margin: 0 -15px;
+        width: calc(100% + 30px);
+        padding: 15px 15px 15px 15px; /* Ensure padding inside the full width */
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab {
+        flex-shrink: 0;
+        min-width: 120px;
+    }
+
+    .data-table {
+        font-size: 12px;
+        min-width: 100%;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-card .number {
+        font-size: 24px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .actions {
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        flex: 1;
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header,
+    .container {
+        padding: 10px;
+    }
+
+    .panel {
+        padding: 10px;
+        margin: 0 -10px;
+        width: calc(100% + 20px);
+    }
+
+    #departments-panel,
+    #posts-panel,
+    #pdfs-panel,
+    #sections-panel {
+        margin: 0 -10px;
+        width: calc(100% + 20px);
+        padding: 10px 10px 10px 10px;
+    }
+
+    .tabs {
+        gap: 5px;
+    }
+
+    .tab {
+        padding: 10px 15px;
+        font-size: 13px;
+        min-width: 100px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 6px;
+        font-size: 11px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        padding: 15px;
+        margin: 0;
+    }
+
+    .modal-header {
+        margin-bottom: 15px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+}</style>
 </head>
 <body>
     <div class="header">
@@ -366,10 +504,10 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('sections')">Sections</button>
-            <button class="tab" onclick="switchTab('departments')">Departments</button>
-            <button class="tab" onclick="switchTab('posts')">Posts</button>
-            <button class="tab" onclick="switchTab('pdfs')">PDFs</button>
+            <button class="tab active" onclick="switchTab('sections', this)">Sections</button>
+            <button class="tab" onclick="switchTab('departments', this)">Departments</button>
+            <button class="tab" onclick="switchTab('posts', this)">Posts</button>
+            <button class="tab" onclick="switchTab('pdfs', this)">PDFs</button>
         </div>
 
         <!-- Sections Panel -->
@@ -426,35 +564,70 @@
         let currentEditId = null;
         let currentEditType = null;
 
+        const pluralToSingular = {
+            sections: 'section',
+            departments: 'department',
+            posts: 'post',
+            pdfs: 'pdf'
+        };
+
+        const singularToTable = {
+            section: 'sections',
+            department: 'departments',
+            post: 'posts',
+            pdf: 'pdfs'
+        };
+
+        const selectParams = {
+            sections: '',
+            departments: 'select=*,sections(name)',
+            posts: 'select=*,departments(name)',
+            pdfs: 'select=*,posts(name)'
+        };
+
+        const orderParams = {
+            sections: 'order=display_order.asc',
+            departments: 'order=display_order.asc',
+            posts: 'order=display_order.asc',
+            pdfs: 'order=year.desc'
+        };
+
+        const columnsMap = {
+            sections: ['simple_id', 'name', 'description', 'display_order'],
+            departments: ['simple_id', 'name', 'sections.name', 'description', 'display_order'],
+            posts: ['simple_id', 'name', 'departments.name', 'description', 'display_order'],
+            pdfs: ['simple_id', 'title', 'posts.name', 'year', 'file_size']
+        };
+
         // API Functions
         async function apiRequest(endpoint, options = {}) {
-    const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
-    const headers = {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-        ...options.headers
-    };
+            const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+            const headers = {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation',
+                ...options.headers
+            };
 
-    const response = await fetch(url, { ...options, headers });
-    if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `API Error: ${response.statusText}`;
-        
-        try {
-            const errorJson = JSON.parse(errorText);
-            errorMessage = errorJson.message || errorJson.hint || errorText;
-        } catch (e) {
-            errorMessage = errorText || errorMessage;
+            const response = await fetch(url, { ...options, headers });
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = `API Error: ${response.statusText}`;
+                
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.message || errorJson.hint || errorText;
+                } catch (e) {
+                    errorMessage = errorText || errorMessage;
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            const text = await response.text();
+            return text ? JSON.parse(text) : [];
         }
-        
-        throw new Error(errorMessage);
-    }
-    
-    const text = await response.text();
-    return text ? JSON.parse(text) : {};
-}
 
         async function fetchData(table, params = '') {
             return apiRequest(`${table}?${params}`);
@@ -493,12 +666,12 @@
             }, 5000);
         }
 
-        function switchTab(tab) {
+        function switchTab(tab, btn) {
             currentTab = tab;
 
             // Update tab buttons
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            btn.classList.add('active');
 
             // Update panels
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -513,31 +686,14 @@
             container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
 
             try {
-                let data;
-                let columns;
-
-                switch(tab) {
-                    case 'sections':
-                        data = await fetchData('sections', 'order=display_order.asc');
-                        columns = ['simple_id', 'name', 'description', 'display_order'];
-                        break;
-                    case 'departments':
-                        data = await fetchData('departments', 'select=*,sections(name)&order=display_order.asc');
-                        columns = ['simple_id', 'name', 'sections.name', 'description', 'display_order'];
-                        break;
-                    case 'posts':
-                        data = await fetchData('posts', 'select=*,departments(name)&order=display_order.asc');
-                        columns = ['simple_id', 'name', 'departments.name', 'description', 'display_order'];
-                        break;
-                    case 'pdfs':
-                        data = await fetchData('pdfs', 'select=*,posts(name)&order=year.desc');
-                        columns = ['simple_id', 'title', 'posts.name', 'year', 'file_size'];
-                        break;
-                }
+                const params = `${selectParams[tab]}&${orderParams[tab]}`;
+                const data = await fetchData(tab, params);
+                const columns = columnsMap[tab];
 
                 renderTable(data, columns, tab, container);
             } catch (error) {
                 container.innerHTML = `<div class="alert alert-error">Error loading data: ${error.message}</div>`;
+                console.error('Load error:', error);
             }
         }
 
@@ -551,7 +707,8 @@
 
             // Headers
             columns.forEach(col => {
-                html += `<th>${col.replace('_', ' ').toUpperCase()}</th>`;
+                const displayCol = col.replace(/[_]/g, ' ').replace('.', ' ').toUpperCase();
+                html += `<th>${displayCol}</th>`;
             });
             html += '<th>ACTIONS</th></tr></thead><tbody>';
 
@@ -564,10 +721,10 @@
                         const parts = col.split('.');
                         value = item[parts[0]]?.[parts[1]] || '-';
                     }
-                    html += `<td>${value || '-'}</td>`;
+                    html += `<td>${(value || '-').toString()}</td>`;
                 });
                 html += `<td class="actions">
-                    <button class="btn btn-warning btn-sm" onclick='editItem("${type}", ${JSON.stringify(item)})'>Edit</button>
+                    <button class="btn btn-warning btn-sm edit-btn" data-type="${type}" data-id="${item.id}">Edit</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteItem('${type}', '${item.id}')">Delete</button>
                 </td></tr>`;
             });
@@ -576,20 +733,34 @@
             container.innerHTML = html;
         }
 
-        function openAddModal(type) {
+        async function openAddModal(type) {
             currentEditType = type;
             currentEditId = null;
             document.getElementById('modalTitle').textContent = `Add New ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-            generateForm(type, null);
+            await generateForm(type, null);
             document.getElementById('editModal').classList.add('active');
         }
 
-        function editItem(type, item) {
-            currentEditType = type;
-            currentEditId = item.id;
-            document.getElementById('modalTitle').textContent = `Edit ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-            generateForm(type, item);
-            document.getElementById('editModal').classList.add('active');
+        async function editItem(pluralType, id) {
+            const singularType = pluralToSingular[pluralType];
+            currentEditType = singularType;
+            currentEditId = id;
+            try {
+                const table = singularToTable[singularType];
+                const selectParam = selectParams[pluralType];
+                const params = `${selectParam}&id=eq.${id}`;
+                const fetched = await fetchData(table, params);
+                if (fetched.length === 0) {
+                    throw new Error('Item not found');
+                }
+                const item = fetched[0];
+                document.getElementById('modalTitle').textContent = `Edit ${singularType.charAt(0).toUpperCase() + singularType.slice(1)}`;
+                await generateForm(singularType, item);
+                document.getElementById('editModal').classList.add('active');
+            } catch (error) {
+                showAlert(`Error loading item: ${error.message}`, 'error');
+                console.error('Edit load error:', error);
+            }
         }
 
         async function generateForm(type, data) {
@@ -601,11 +772,11 @@
                     html = `
                         <div class="form-group">
                             <label>Name *</label>
-                            <input type="text" name="name" value="${data?.name || ''}" required>
+                            <input type="text" name="name" value="${(data?.name || '').replace(/"/g, '&quot;')}" required>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea name="description">${data?.description || ''}</textarea>
+                            <textarea name="description">${(data?.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -624,22 +795,22 @@
                     `;
                     break;
 
-                case 'department':
-                    const sections = await fetchData('sections', 'order=display_order.asc');
+                case 'department': {
+                    const sections = await fetchData('sections', orderParams.sections);
                     html = `
                         <div class="form-group">
                             <label>Section *</label>
                             <select name="section_id" required>
-                                ${sections.map(s => `<option value="${s.id}" ${data?.section_id === s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+                                ${sections.map(s => `<option value="${s.id}" ${data?.section_id == s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Name *</label>
-                            <input type="text" name="name" value="${data?.name || ''}" required>
+                            <input type="text" name="name" value="${(data?.name || '').replace(/"/g, '&quot;')}" required>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea name="description">${data?.description || ''}</textarea>
+                            <textarea name="description">${(data?.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Display Order</label>
@@ -647,23 +818,24 @@
                         </div>
                     `;
                     break;
+                }
 
-                case 'post':
-                    const departments = await fetchData('departments', 'select=*,sections(name)&order=display_order.asc');
+                case 'post': {
+                    const departments = await fetchData('departments', `${selectParams.departments}&${orderParams.departments}`);
                     html = `
                         <div class="form-group">
                             <label>Department *</label>
                             <select name="department_id" required>
-                                ${departments.map(d => `<option value="${d.id}" ${data?.department_id === d.id ? 'selected' : ''}>${d.name} (${d.sections.name})</option>`).join('')}
+                                ${departments.map(d => `<option value="${d.id}" ${data?.department_id == d.id ? 'selected' : ''}>${d.name} (${d.sections?.name || ''})</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Name *</label>
-                            <input type="text" name="name" value="${data?.name || ''}" required>
+                            <input type="text" name="name" value="${(data?.name || '').replace(/"/g, '&quot;')}" required>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea name="description">${data?.description || ''}</textarea>
+                            <textarea name="description">${(data?.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Display Order</label>
@@ -671,128 +843,134 @@
                         </div>
                     `;
                     break;
+                }
 
-                case 'pdf':
-    const posts = await fetchData('posts', 'select=*,departments(name,sections(name))&order=display_order.asc');
-    html = `
-        <div class="form-group">
-            <label>Post *</label>
-            <select name="post_id" required>
-                <option value="">-- Select Post --</option>
-                ${posts.map(p => `<option value="${p.id}" ${data?.post_id === p.id ? 'selected' : ''}>${p.name} (${p.departments.name})</option>`).join('')}
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Title *</label>
-            <input type="text" name="title" value="${data?.title || ''}" required placeholder="e.g., Jr. Clerk Question Paper 2018">
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Year *</label>
-                <input type="number" name="year" value="${data?.year || new Date().getFullYear()}" required min="1990" max="${new Date().getFullYear()}">
-            </div>
-            <div class="form-group">
-                <label>File Size</label>
-                <input type="text" name="file_size" value="${data?.file_size || ''}" placeholder="e.g., 2.5 MB">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Google Drive Link *</label>
-            <input type="url" name="drive_link" value="${data?.drive_link || ''}" required placeholder="https://drive.google.com/file/d/...">
-            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
-                Make sure the file is set to "Anyone with the link can view"
-            </small>
-        </div>
-    `;
-    break;
-}
+                case 'pdf': {
+                    const posts = await fetchData('posts', `${selectParams.posts}&${orderParams.posts}`);
+                    html = `
+                        <div class="form-group">
+                            <label>Post *</label>
+                            <select name="post_id" required>
+                                <option value="">-- Select Post --</option>
+                                ${posts.map(p => `<option value="${p.id}" ${data?.post_id == p.id ? 'selected' : ''}>${p.name} (${p.departments?.name || ''})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="title" value="${(data?.title || '').replace(/"/g, '&quot;')}" required placeholder="e.g., Jr. Clerk Question Paper 2018">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Year *</label>
+                                <input type="number" name="year" value="${data?.year || new Date().getFullYear()}" required min="1990" max="${new Date().getFullYear()}">
+                            </div>
+                            <div class="form-group">
+                                <label>File Size</label>
+                                <input type="text" name="file_size" value="${(data?.file_size || '').replace(/"/g, '&quot;')}" placeholder="e.g., 2.5 MB">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Google Drive Link *</label>
+                            <input type="url" name="drive_link" value="${(data?.drive_link || '').replace(/"/g, '&quot;')}" required placeholder="https://drive.google.com/file/d/...">
+                            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                                Make sure the file is set to "Anyone with the link can view"
+                            </small>
+                        </div>
+                    `;
+                    break;
+                }
+            }
 
             container.innerHTML = html;
         }
 
         // Helper function to clean form data
-function cleanFormData(data, type) {
-    // Remove empty strings
-    Object.keys(data).forEach(key => {
-        if (data[key] === '') {
-            delete data[key];
+        function cleanFormData(data, type) {
+            // Remove empty strings
+            Object.keys(data).forEach(key => {
+                if (data[key] === '') {
+                    delete data[key];
+                }
+            });
+
+            // Convert numeric fields
+            if (data.display_order) {
+                data.display_order = parseInt(data.display_order, 10);
+            }
+            if (data.year) {
+                data.year = parseInt(data.year, 10);
+            }
+
+            // Add defaults for PDFs on insert
+            if (type === 'pdf' && currentEditId === null && data.download_count === undefined) {
+                data.download_count = 0;
+            }
+
+            return data;
         }
-    });
-
-    // Convert numeric fields
-    if (data.display_order) {
-        data.display_order = parseInt(data.display_order);
-    }
-    if (data.year) {
-        data.year = parseInt(data.year);
-    }
-
-    // Add defaults for PDFs
-    if (type === 'pdf' && data.download_count === undefined) {
-        data.download_count = 0;
-    }
-
-    return data;
-}
 
         async function handleFormSubmit(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    let data = Object.fromEntries(formData.entries());
-    
-    // Clean and validate data
-    data = cleanFormData(data, currentEditType);
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            let data = Object.fromEntries(formData.entries());
+            
+            // Clean and validate data
+            data = cleanFormData(data, currentEditType);
 
-    try {
-        const table = currentEditType === 'section' ? 'sections' :
-                     currentEditType === 'department' ? 'departments' :
-                     currentEditType === 'post' ? 'posts' : 'pdfs';
-
-        if (currentEditId) {
-            await updateData(table, currentEditId, data);
-            showAlert(`${currentEditType} updated successfully!`);
-        } else {
-            await insertData(table, data);
-            showAlert(`${currentEditType} added successfully!`);
-        }
-
-        closeModal();
-        loadTabData(currentTab);
-        loadStats();
-    } catch (error) {
-        console.error('Submit error:', error);
-        showAlert(`Error: ${error.message}`, 'error');
-    }
-}
-
-
-        async function deleteItem(type, id) {
-            if (!confirm('Are you sure you want to delete this item?')) return;
+            if (!data || Object.keys(data).length === 0) {
+                showAlert('No data to save', 'error');
+                return;
+            }
 
             try {
-                const table = type === 'section' ? 'sections' :
-                             type === 'department' ? 'departments' :
-                             type === 'post' ? 'posts' : 'pdfs';
+                const table = singularToTable[currentEditType];
 
-                await deleteData(table, id);
-                showAlert(`${type} deleted successfully!`);
-                loadTabData(currentTab);
-                loadStats();
+                if (currentEditId) {
+                    await updateData(table, currentEditId, data);
+                    showAlert(`${currentEditType.charAt(0).toUpperCase() + currentEditType.slice(1)} updated successfully!`);
+                } else {
+                    await insertData(table, data);
+                    showAlert(`${currentEditType.charAt(0).toUpperCase() + currentEditType.slice(1)} added successfully!`);
+                }
+
+                closeModal();
+                await loadTabData(currentTab);
+                await loadStats();
             } catch (error) {
-                showAlert(`Error: ${error.message}`, 'error');
+                console.error('Submit error:', error);
+                showAlert(`Error saving: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteItem(pluralType, id) {
+            if (!confirm(`Are you sure you want to delete this ${pluralType.slice(0, -1)}?`)) return;
+
+            try {
+                const singularType = pluralToSingular[pluralType];
+                const table = singularToTable[singularType];
+                await deleteData(table, id);
+                showAlert(`${singularType.charAt(0).toUpperCase() + singularType.slice(1)} deleted successfully!`);
+                await loadTabData(currentTab);
+                await loadStats();
+            } catch (error) {
+                showAlert(`Error deleting: ${error.message}`, 'error');
+                console.error('Delete error:', error);
             }
         }
 
         function closeModal() {
             document.getElementById('editModal').classList.remove('active');
+            document.getElementById('formFields').innerHTML = '';
         }
 
         async function loadStats() {
             try {
-                const sections = await fetchData('sections');
-                const departments = await fetchData('departments');
-                const posts = await fetchData('posts');
-                const pdfs = await fetchData('pdfs');
+                const [sections, departments, posts, pdfs] = await Promise.all([
+                    fetchData('sections'),
+                    fetchData('departments'),
+                    fetchData('posts'),
+                    fetchData('pdfs')
+                ]);
 
                 document.getElementById('statSections').textContent = sections.length;
                 document.getElementById('statDepartments').textContent = departments.length;
@@ -806,15 +984,26 @@ function cleanFormData(data, type) {
         // Event Listeners
         document.getElementById('editForm').addEventListener('submit', handleFormSubmit);
 
+        // Global event listener for edit buttons (delegation)
+        document.addEventListener('click', async function(e) {
+            if (e.target.matches('.edit-btn')) {
+                const pluralType = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                await editItem(pluralType, id);
+            }
+        });
+
         // Initial Load
-        loadTabData('sections');
-        loadStats();
+        (async () => {
+            await loadTabData('sections');
+            await loadStats();
+        })();
     </script>
         <!-- PWA Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
+                navigator.serviceWorker.register('./sw.js') 
                     .then(registration => {
                         console.log('SW registered successfully:', registration.scope);
                     })
