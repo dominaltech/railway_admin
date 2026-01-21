@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RailBook Admin Panel</title>
     
@@ -428,21 +428,33 @@
 
         // API Functions
         async function apiRequest(endpoint, options = {}) {
-            const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
-            const headers = {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation',
-                ...options.headers
-            };
+    const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+    const headers = {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+        ...options.headers
+    };
 
-            const response = await fetch(url, { ...options, headers });
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.statusText}`);
-            }
-            return response.json();
+    const response = await fetch(url, { ...options, headers });
+    if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `API Error: ${response.statusText}`;
+        
+        try {
+            const errorJson = JSON.parse(errorText);
+            errorMessage = errorJson.message || errorJson.hint || errorText;
+        } catch (e) {
+            errorMessage = errorText || errorMessage;
         }
+        
+        throw new Error(errorMessage);
+    }
+    
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
+}
 
         async function fetchData(table, params = '') {
             return apiRequest(`${table}?${params}`);
@@ -661,64 +673,98 @@
                     break;
 
                 case 'pdf':
-                    const posts = await fetchData('posts', 'select=*,departments(name,sections(name))&order=display_order.asc');
-                    html = `
-                        <div class="form-group">
-                            <label>Post *</label>
-                            <select name="post_id" required>
-                                ${posts.map(p => `<option value="${p.id}" ${data?.post_id === p.id ? 'selected' : ''}>${p.name} (${p.departments.name})</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" name="title" value="${data?.title || ''}" required>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Year *</label>
-                                <input type="number" name="year" value="${data?.year || new Date().getFullYear()}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>File Size</label>
-                                <input type="text" name="file_size" value="${data?.file_size || ''}" placeholder="e.g., 2.5 MB">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Google Drive Link *</label>
-                            <input type="url" name="drive_link" value="${data?.drive_link || ''}" required placeholder="https://drive.google.com/file/d/...">
-                        </div>
-                    `;
-                    break;
-            }
+    const posts = await fetchData('posts', 'select=*,departments(name,sections(name))&order=display_order.asc');
+    html = `
+        <div class="form-group">
+            <label>Post *</label>
+            <select name="post_id" required>
+                <option value="">-- Select Post --</option>
+                ${posts.map(p => `<option value="${p.id}" ${data?.post_id === p.id ? 'selected' : ''}>${p.name} (${p.departments.name})</option>`).join('')}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Title *</label>
+            <input type="text" name="title" value="${data?.title || ''}" required placeholder="e.g., Jr. Clerk Question Paper 2018">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Year *</label>
+                <input type="number" name="year" value="${data?.year || new Date().getFullYear()}" required min="1990" max="${new Date().getFullYear()}">
+            </div>
+            <div class="form-group">
+                <label>File Size</label>
+                <input type="text" name="file_size" value="${data?.file_size || ''}" placeholder="e.g., 2.5 MB">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Google Drive Link *</label>
+            <input type="url" name="drive_link" value="${data?.drive_link || ''}" required placeholder="https://drive.google.com/file/d/...">
+            <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                Make sure the file is set to "Anyone with the link can view"
+            </small>
+        </div>
+    `;
+    break;
+}
 
             container.innerHTML = html;
         }
 
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-
-            try {
-                const table = currentEditType === 'section' ? 'sections' :
-                             currentEditType === 'department' ? 'departments' :
-                             currentEditType === 'post' ? 'posts' : 'pdfs';
-
-                if (currentEditId) {
-                    await updateData(table, currentEditId, data);
-                    showAlert(`${currentEditType} updated successfully!`);
-                } else {
-                    await insertData(table, data);
-                    showAlert(`${currentEditType} added successfully!`);
-                }
-
-                closeModal();
-                loadTabData(currentTab);
-                loadStats();
-            } catch (error) {
-                showAlert(`Error: ${error.message}`, 'error');
-            }
+        // Helper function to clean form data
+function cleanFormData(data, type) {
+    // Remove empty strings
+    Object.keys(data).forEach(key => {
+        if (data[key] === '') {
+            delete data[key];
         }
+    });
+
+    // Convert numeric fields
+    if (data.display_order) {
+        data.display_order = parseInt(data.display_order);
+    }
+    if (data.year) {
+        data.year = parseInt(data.year);
+    }
+
+    // Add defaults for PDFs
+    if (type === 'pdf' && data.download_count === undefined) {
+        data.download_count = 0;
+    }
+
+    return data;
+}
+
+        async function handleFormSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    let data = Object.fromEntries(formData.entries());
+    
+    // Clean and validate data
+    data = cleanFormData(data, currentEditType);
+
+    try {
+        const table = currentEditType === 'section' ? 'sections' :
+                     currentEditType === 'department' ? 'departments' :
+                     currentEditType === 'post' ? 'posts' : 'pdfs';
+
+        if (currentEditId) {
+            await updateData(table, currentEditId, data);
+            showAlert(`${currentEditType} updated successfully!`);
+        } else {
+            await insertData(table, data);
+            showAlert(`${currentEditType} added successfully!`);
+        }
+
+        closeModal();
+        loadTabData(currentTab);
+        loadStats();
+    } catch (error) {
+        console.error('Submit error:', error);
+        showAlert(`Error: ${error.message}`, 'error');
+    }
+}
+
 
         async function deleteItem(type, id) {
             if (!confirm('Are you sure you want to delete this item?')) return;
@@ -764,7 +810,7 @@
         loadTabData('sections');
         loadStats();
     </script>
-    <!-- PWA Service Worker Registration -->
+        <!-- PWA Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
